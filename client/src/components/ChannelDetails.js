@@ -24,7 +24,7 @@ const ChannelDetails = ({ data: {loading, error, channel }, match }) => {
       <div className="channelName">
         {channel.name}
       </div>
-      <MessageList messages={channel.messages}/>
+      <MessageList messages={channel.messages} views={channel.views} />
     </div>);
 }
 
@@ -33,6 +33,7 @@ export const channelDetailsQuery = gql`
     channel(id: $channelId) {
       id
       name
+      views
       messages {
         id
         text

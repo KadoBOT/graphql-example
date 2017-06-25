@@ -4,6 +4,9 @@ import {
   graphqlExpress,
   graphiqlExpress,
 } from 'graphql-server-express';
+import { execute, subscribe } from 'graphql';
+import { createServer } from 'http';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
@@ -11,6 +14,7 @@ import { schema } from './src/schema';
 
 const PORT = 4000;
 const server = express();
+const ws = createServer(server)
 
 server.use('*', cors({ origin: 'http://localhost:3000' }));
 
@@ -19,9 +23,19 @@ server.use('/graphql', bodyParser.json(), graphqlExpress({
 }));
 
 server.use('/graphiql', graphiqlExpress({
-  endpointURL: '/graphql'
+  endpointURL: '/graphql',
+  subscriptionsEndpoint: `ws://localhost:4000/subscriptions`
 }));
 
-server.listen(PORT, () => 
+ws.listen(PORT, () => {
   console.log(`GraphQL Server is now running on http://localhost:${PORT}`)
-);
+
+  new SubscriptionServer({
+    execute,
+    subscribe,
+    schema
+  }, {
+    server: ws,
+    path: '/subscriptions'
+  })
+});

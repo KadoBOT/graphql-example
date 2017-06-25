@@ -10,6 +10,7 @@ type Channel {
   id: ID!                # "!" denotes a required field
   name: String
   messages: [Message]!
+  views: Int
 }
 
 input MessageInput{
@@ -32,6 +33,10 @@ type Query {
 type Mutation {
   addChannel(name: String!): Channel
   addMessage(message: MessageInput!): Message
+}
+
+type Subscription {
+  messageAdded(channelId: ID!): Message
 }
 `;
 
